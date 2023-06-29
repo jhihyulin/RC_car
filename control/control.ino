@@ -2,19 +2,19 @@
 #define BAUDRATE 115200  // setup baudrate
 #define BOUNCER_DELAY 40
 //------------------------- pin setup START -------------------------
-#define button_1_pin 27
-#define button_2_pin 26
-#define button_3_pin 25
-#define button_4_pin 22
+#define button_1_pin 9
+#define button_2_pin 6
+#define button_3_pin 5
+#define button_4_pin 4
 
-#define switch_1_pin 12
-#define switch_2_pin 14
+#define switch_1_pin A7
+#define switch_2_pin A6
 
-#define JoyStick_1_X_pin 33
-#define JoyStick_1_Y_pin 32
-#define JoyStick_1_button_pin 23
-#define JoyStick_2_X_pin 35
-#define JoyStick_2_Y_pin 34
+#define JoyStick_1_X_pin A0
+#define JoyStick_1_Y_pin A1
+#define JoyStick_1_button_pin 16
+#define JoyStick_2_X_pin A3
+#define JoyStick_2_Y_pin A4
 #define JoyStick_2_button_pin 19
 //------------------------- pin setup END -------------------------
 
@@ -103,27 +103,37 @@ void loop() {
   switch_2_bouncer.update();
 
   if (button_1_bouncer.fell()) {
-    turn_left_light_status = true;
+    if (turn_left_light_status) {
+      turn_left_light_status = false;
+    } else {
+      turn_left_light_status = true;
+    }
     turn_right_light_status = false;
     guard_light_status = false;
-  }
-  if (button_4_bouncer.fell()) {
-    turn_left_light_status = false;
-    turn_right_light_status = true;
-    guard_light_status = false;
-  }
-  if (button_2_bouncer.fell()) {
+  } else if (button_2_bouncer.fell()) {
     turn_left_light_status = false;
     turn_right_light_status = false;
-    guard_light_status = true;
+    if (guard_light_status) {
+      guard_light_status = false;
+    } else {
+      guard_light_status = true;
+    }
+  } else if (button_4_bouncer.fell()) {
+    turn_left_light_status = false;
+    if (turn_right_light_status) {
+      turn_right_light_status = false;
+    } else {
+      turn_right_light_status = true;
+    }
+    guard_light_status = false;
   }
-  if (button_3_bouncer.fell()) {
-    brakelight_status = true;
-    data[9] = true;
-  }
-  if (button_3_bouncer.rose()) {
+
+  if (digitalRead(button_3_pin) == HIGH) {
     brakelight_status = false;
     data[9] = false;
+  } else {
+    brakelight_status = true;
+    data[9] = true;
   }
 
   // 設定要傳送的資料
@@ -132,23 +142,31 @@ void loop() {
   data[2] = turn_left_light_status;
   data[3] = turn_right_light_status;
   data[4] = guard_light_status;
-  data[5] = headlight_status;
-  data[6] = foglight_status;
+  data[5] = ADConvert(switch_1_pin);
+  data[6] = ADConvert(switch_2_pin);
   data[7] = brakelight_status;
   data[8] = false;// EMPTY
 
   Serial.println(String("") + data[0] + " " + data[1] + " " + data[2] + " " + data[3] + " " + data[4] + " " + data[5] + " " + data[6] + " " + data[7] + " " + data[8] + " " + data[9]);
 
   radio.write(&data, sizeof(data));
-  delay(DELAYTIME);
 }
 
 int analog_deal(int value) {
-  int map_value = map(analogRead(value), 0, 4095, 0, 255);
+  int map_value = map(value, 0, 1023, 0, 255);
   if (map_value > 111 && map_value < 143) {
     // ignore noise
     return 127;
   } else {
     return map_value;
+  }
+}
+
+bool ADConvert(int pin) {
+  int value = analogRead(pin);
+  if (value > 512) {
+    return true;
+  } else {
+    return false;
   }
 }

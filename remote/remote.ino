@@ -1,35 +1,35 @@
 #define BAUDRATE 115200  // setup baudrate
 #define receive_timeout 1000
 //------------------------- pin setup START -------------------------
-#define motorA_1_pin 27
-#define motorA_2_pin 26
+#define motorA_1_pin 6
+#define motorA_2_pin 5
 
-#define servo_1_pin 2
-#define servo_1_min 80
-#define servo_1_mid 90
-#define servo_1_max 100
+#define servo_1_pin 3
+#define servo_1_min 125
+#define servo_1_mid 95
+#define servo_1_max 65
 
 // mode 0: on, 1: blink
-#define light_1_pin 13
-#define light_1_mode 0
+#define light_1_pin 10// turn left light
+#define light_1_mode 1
 
-#define light_2_pin 12
-#define light_2_mode 0
+#define light_2_pin 9// turn right light
+#define light_2_mode 1
 
-#define light_3_pin 14
+#define light_3_pin 4// break light
 #define light_3_mode 0
 
-#define light_4_pin 32
+#define light_4_pin 14// head light
 #define light_4_mode 0
 
-#define light_5_pin 4
+#define light_5_pin 15// fog light
 #define light_5_mode 0
 
-#define light_6_pin 16
-#define light_6_mode 1
+#define light_6_pin 16// Empty
+#define light_6_mode 0
 
-#define light_7_pin 17
-#define light_7_mode 1
+#define light_7_pin 17// Empty
+#define light_7_mode 0
 //------------------------- pin setup END -------------------------
 
 //------------------------- PWM channel setup START ------------------------
@@ -95,19 +95,19 @@ void recvData() {
 
     myData.X = data[0];
     myData.Y = data[1];
-    myData.light_1 = data[2];
-    myData.light_2 = data[3];
-    myData.light_3 = data[4];
-    myData.light_4 = data[5];
-    myData.light_5 = data[6];
-    myData.light_6 = data[7];
-    myData.light_7 = data[8];
+    myData.light_1 = data[2];// turn left light
+    myData.light_2 = data[3];// turn right light
+    myData.light_3 = data[4];// guard light
+    myData.light_4 = data[7];// break light
+    myData.light_5 = data[5];// head light
+    myData.light_6 = data[6];// fog light
+    myData.light_7 = data[8];// Empty
     myData.brek = data[9];
 
     Serial.println(String("") + data[0] + " " + data[1] + " " + data[2] + " " + data[3] + " " + data[4] + " " + data[5] + " " + data[6] + " " + data[7] + " " + data[8] + " " + data[9]);
 
     lastRecvTime = millis();
-    Serial.println('Recieved Data');
+    // Serial.println('Recieved Data');
   }
 }
 
@@ -128,14 +128,20 @@ void loop() {
 
   servo_control(servo_1, myData.Y, servo_1_min, servo_1_mid, servo_1_max);
 
-  light_control(light_1_pin, light_1_mode, myData.light_1);
-  light_control(light_2_pin, light_2_mode, myData.light_2);
-  light_control(light_3_pin, light_3_mode, myData.light_3);
-  light_control(light_4_pin, light_4_mode, myData.light_4);
-  light_control(light_5_pin, light_5_mode, myData.light_5);
-  light_control(light_6_pin, light_6_mode, myData.light_6);
-  light_control(light_7_pin, light_7_mode, myData.light_7);
-  delay(50);
+  // turn light and guard light
+  if (myData.light_3) {
+    light_control(light_1_pin, light_1_mode, true);
+    light_control(light_2_pin, light_2_mode, true);
+  } else {
+    light_control(light_1_pin, light_1_mode, myData.light_1);
+    light_control(light_2_pin, light_2_mode, myData.light_2);
+  }
+
+  light_control(light_3_pin, light_3_mode, myData.light_4);
+  light_control(light_6_pin, light_6_mode, myData.light_5);
+  light_control(light_5_pin, light_5_mode, myData.light_6);
+  light_control(light_4_pin, light_4_mode, myData.light_7);// Empty
+  light_control(light_7_pin, light_7_mode, false);// Empty
 }
 
 void motor_control(int pinA, int pinB, int value) {
