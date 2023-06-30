@@ -16,6 +16,8 @@
 #define JoyStick_2_X_pin A3
 #define JoyStick_2_Y_pin A4
 #define JoyStick_2_button_pin 19
+
+#define battery_module_key_pin 10
 //------------------------- pin setup END -------------------------
 
 #include <RF24.h>
@@ -93,6 +95,13 @@ int mapJoystickValues(int val, int lower, int middle, int upper) {
 }
 
 void loop() {
+  // every 20 second send LOW signal to battery_module_key_pin (LOW signal trigger)
+  if (millis() % 20000 < 500) {
+    digitalWrite(battery_module_key_pin, LOW);
+  } else {
+    digitalWrite(battery_module_key_pin, HIGH);
+  }
+
   // X, Y, light_1, light_2, light_3, light_4, light_5, light_6, light_7, brek
   int data[10];
   button_1_bouncer.update();
