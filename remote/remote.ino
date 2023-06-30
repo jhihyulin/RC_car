@@ -5,9 +5,9 @@
 #define motorA_2_pin 5
 
 #define servo_1_pin 3
-#define servo_1_min 125
+#define servo_1_min 110
 #define servo_1_mid 95
-#define servo_1_max 65
+#define servo_1_max 80
 
 // mode 0: on, 1: blink
 #define light_1_pin 10// turn left light
