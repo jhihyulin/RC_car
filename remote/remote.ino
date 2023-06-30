@@ -149,11 +149,11 @@ void motor_control(int pinA, int pinB, int value) {
     digitalWrite(motorA_1_pin, LOW);
     digitalWrite(motorA_2_pin, LOW);
   } else if (value > 127) {
-    analogWrite(motorA_1_pin, (value - 127) * 2);
+    analogWrite(motorA_1_pin, (value - 127.5) * 2);
     digitalWrite(motorA_2_pin, LOW);
   } else {
     digitalWrite(motorA_1_pin, LOW);
-    analogWrite(motorA_2_pin, (127 - value) * 2);
+    analogWrite(motorA_2_pin, (127.5 - value) * 2);
   }
 }
 

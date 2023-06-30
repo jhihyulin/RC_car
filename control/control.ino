@@ -166,6 +166,12 @@ int analog_deal(int value) {
   if (map_value > 111 && map_value < 143) {
     // ignore noise
     return 127;
+  } else if (map_value > 240) {
+    // ignore noise
+    return 255;
+  } else if (map_value < 15) {
+    // ignore noise
+    return 0;
   } else {
     return map_value;
   }
