@@ -2,10 +2,10 @@
 #define BAUDRATE 115200  // setup baudrate
 #define BOUNCER_DELAY 40
 //------------------------- pin setup START -------------------------
-#define button_1_pin 9
+#define button_1_pin 4
 #define button_2_pin 6
 #define button_3_pin 5
-#define button_4_pin 4
+#define button_4_pin 9
 
 #define switch_1_pin A7
 #define switch_2_pin A6
